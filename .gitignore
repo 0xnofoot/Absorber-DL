@@ -1,0 +1,6 @@
+.venv
+backup
+data
+core/*/log
+core/*/ext
+Pipfile.lock
