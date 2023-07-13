@@ -3,6 +3,7 @@ import re
 import shutil
 from datetime import datetime
 
+import numpy as np
 import torch
 from matplotlib import pyplot as plt
 
@@ -75,6 +76,24 @@ def save_loss_pic(log_dir):
     plt.legend()
     pic_dir = os.path.join(log_dir, LOSS_DIR_NAME, "loss.png")
     plt.savefig(pic_dir)
+
+
+# 以逆时针旋转 90°显示该矩阵
+def save_mat_rat90(matrix, save_path):
+    matrix = np.rot90(matrix, 1)
+    plt.matshow(matrix, cmap=plt.cm.Greys)
+    plt.xticks(alpha=0)
+    plt.yticks(alpha=0)
+    plt.tick_params(axis='x', width=0)
+    plt.tick_params(axis='y', width=0)
+    # plt.grid()
+    plt.savefig(save_path)
+    plt.close("all")
+
+
+def save_mat_data(matrix, save_path):
+    # 矩阵以 %d 数据类型保存，并以" "做分隔符保存到 test.txt文件中
+    np.savetxt(save_path, matrix, fmt="%d", delimiter=" ")
 
 
 if __name__ == "__main__":

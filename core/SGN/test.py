@@ -50,35 +50,50 @@ for data, target in train_loader:
 
     sps = sps.cpu().detach().numpy()
     g_sps = g_sps.cpu().detach().numpy()
+    imgs = imgs.cpu().numpy()
+    g_imgs = g_imgs.detach().cpu().numpy()
 
     for i in range(b_size):
-        img = imgs[i]
-        g_img = g_imgs[i]
+        count += 1
+
+        img = imgs[i][0]
+        g_img = g_imgs[i][0]
         sp = sps[i]
         g_sp = g_sps[i]
 
-        plt.plot(np.linspace(1, 5, int(y_len)), sp, label="SP")
-        plt.plot(np.linspace(1, 5, int(y_len)), g_sp, label="G_SP")
+        os.makedirs(os.path.join(log_dir, util.TEST_DIR_NAME, str(count)))
+        util.save_mat_rat90(img, os.path.join(log_dir, util.TEST_DIR_NAME, str(count), "mat.png"))
+        util.save_mat_rat90(g_img, os.path.join(log_dir, util.TEST_DIR_NAME, str(count), "g_mat.png"))
+        util.save_mat_data(img, os.path.join(log_dir, util.TEST_DIR_NAME, str(count), "mat.txt"))
+        util.save_mat_data(g_img, os.path.join(log_dir, util.TEST_DIR_NAME, str(count), "g_mat.txt"))
+
+        np.savetxt(os.path.join(log_dir, util.TEST_DIR_NAME, str(count), "sp_bc.txt"), sp)
+        np.savetxt(os.path.join(log_dir, util.TEST_DIR_NAME, str(count), "g_sp_bc.txt"), g_sp)
+
+        plt.plot(np.linspace(1, 5, int(y_len)), sp, label="Simulation")
+        plt.plot(np.linspace(1, 5, int(y_len)), g_sp, label="Predict")
         plt.ylim(-scale / 2, scale / 2)
         plt.xlabel('Frequency (THz)')
         plt.ylabel('Absorptivity(Box-Cox)')
         plt.legend()
-        plt.savefig(os.path.join("./", log_dir, util.TEST_DIR_NAME, str(count + 1) + "_sp_bc.png"))
+        plt.savefig(os.path.join(log_dir, util.TEST_DIR_NAME, str(count) + "_sp_bc.png"))
         plt.close()
 
-        images = torch.cat([img.unsqueeze(0), g_img.unsqueeze(0)], dim=0)
-        save_image(images, os.path.join("./", log_dir, util.TEST_DIR_NAME, str(count + 1) + "_img.png"), normalize=True)
+        # images = torch.cat([img.unsqueeze(0), g_img.unsqueeze(0)], dim=0)
+        # save_image(images, os.path.join("./", log_dir, util.TEST_DIR_NAME, str(count) + "_img.png"), normalize=True)
 
-        # isp = dloader.rev_resolution(np.expand_dims(isp, axis=0))[0]
-        # ig_sp = dloader.rev_resolution(np.expand_dims(ig_sp, axis=0))[0]
-        # # 绘制曲线图
-        # plt.plot(np.linspace(1, 5, int(y_len)), isp, label="SP")
-        # plt.plot(np.linspace(1, 5, int(y_len)), ig_sp, label="GSP")
-        # plt.ylim(0, 1)
-        # plt.xlabel('Frequency (THz)')
-        # plt.ylabel('Absorptivity')
-        # plt.legend()
-        # plt.savefig(os.path.join("./", "comp", str(count) + "_r.png"))
-        # plt.close()
+        sp = dloader.rev_resolution(np.expand_dims(sp, axis=0))[0]
+        g_sp = dloader.rev_resolution(np.expand_dims(g_sp, axis=0))[0]
 
-        count += 1
+        np.savetxt(os.path.join(log_dir, util.TEST_DIR_NAME, str(count), "sp.txt"), sp)
+        np.savetxt(os.path.join(log_dir, util.TEST_DIR_NAME, str(count), "g_sp.txt"), g_sp)
+
+        # 绘制曲线图
+        plt.plot(np.linspace(1, 5, int(y_len)), sp, label="Simulation")
+        plt.plot(np.linspace(1, 5, int(y_len)), g_sp, label="Predict")
+        plt.ylim(0, 1)
+        plt.xlabel('Frequency (THz)')
+        plt.ylabel('Absorptivity')
+        plt.legend()
+        plt.savefig(os.path.join(log_dir, util.TEST_DIR_NAME, str(count) + "_sp.png"))
+        plt.close()

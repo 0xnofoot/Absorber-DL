@@ -8,15 +8,10 @@ from core.SFEN.model import sfen
 
 def get_sgn(img_channels=1, img_size=64, hidden_dim=256, img_latent_dim=64):
     return SGN_0(img_channels, img_size, hidden_dim, img_latent_dim), img_latent_dim
-    # return VAE_1(img_channels, img_size, hidden_dim, img_latent_dim), img_latent_dim
 
 
 def SGN_0(img_channels, img_size, hidden_dim, img_latent_dim):
-    return SGN_builder(ed.Encoder_0, dd.Decoder_0, img_channels, img_size, hidden_dim, img_latent_dim)
-
-
-def SGN_1(img_channels, img_size, hidden_dim, img_latent_dim):
-    return SGN_builder(ed.Encoder_1, dd.Decoder_0, img_channels, img_size, hidden_dim, img_latent_dim)
+    return SGN_builder(ed.Encoder_0, dd.Decoder_1, img_channels, img_size, hidden_dim, img_latent_dim)
 
 
 class SGN_builder(nn.Module):

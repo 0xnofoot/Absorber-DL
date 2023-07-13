@@ -45,7 +45,7 @@ def epoch_train(tloader, epoch_count, lr, log_dir_name=None):
     util.save_loss_pic(log_dir)
 
 
-def train_this(epoc=300, lr=0.001, b_size=64):
+def train_this(epoc=200, lr=0.001, b_size=64):
     train_loader, val_loader, _ = Dataloader_BoxCox("cross_data").get()
     dataset = ConcatDataset([train_loader.dataset, val_loader.dataset])
     d_loader = DataLoader(dataset, batch_size=b_size, shuffle=True, drop_last=True, pin_memory=True)

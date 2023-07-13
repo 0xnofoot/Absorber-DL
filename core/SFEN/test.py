@@ -24,13 +24,17 @@ model.eval()
 
 count = 0
 
+loss = 0
+idx = 0
 mse = torch.nn.MSELoss()
 for data, target in test_loader:
+    idx += 1
     imgs, sps = data.to(DEVICE).detach(), target.to(DEVICE).detach()
     b_size = imgs.size(0)
     g_sps, _, _ = model(sps)
     g_sps = g_sps.detach()
     test_loss = mse(g_sps, sps)
+    loss += test_loss
     TEST_LOSS_FORM = "Test Loss: {:.8f}, "
     test_loss_log = TEST_LOSS_FORM.format(test_loss)
     print(test_loss_log)
@@ -39,15 +43,36 @@ for data, target in test_loader:
     sps = sps.cpu().numpy()
     g_sps = g_sps.cpu().numpy()
     for i in range(b_size):
+        count += 1
         sp = sps[i]
         g_sp = g_sps[i]
+
+        os.makedirs(os.path.join(log_dir, util.TEST_DIR_NAME, str(count)))
+
+        np.savetxt(os.path.join(log_dir, util.TEST_DIR_NAME, str(count), "sp_bc.txt"), sp)
+        np.savetxt(os.path.join(log_dir, util.TEST_DIR_NAME, str(count), "g_sp_bc.txt"), g_sp)
+
         plt.plot(np.linspace(1, 5, int(y_len)), sp, label="SP")
         plt.plot(np.linspace(1, 5, int(y_len)), g_sp, label="G_SP")
         plt.ylim(-scale / 2, scale / 2)
         plt.xlabel('Frequency (THz)')
         plt.ylabel('Absorptivity(Box-Cox)')
         plt.legend()
-        plt.savefig(os.path.join("./", log_dir, util.TEST_DIR_NAME, str(count + 1) + "_sp_bc.png"))
+        plt.savefig(os.path.join("./", log_dir, util.TEST_DIR_NAME, str(count) + "_sp_bc.png"))
         plt.close()
 
-        count += 1
+        sp = dloader.rev_resolution(np.expand_dims(sp, axis=0))[0]
+        g_sp = dloader.rev_resolution(np.expand_dims(g_sp, axis=0))[0]
+
+        np.savetxt(os.path.join(log_dir, util.TEST_DIR_NAME, str(count), "sp.txt"), sp)
+        np.savetxt(os.path.join(log_dir, util.TEST_DIR_NAME, str(count), "g_sp.txt"), g_sp)
+
+        plt.plot(np.linspace(1, 5, int(y_len)), sp, label="Simulation")
+        plt.plot(np.linspace(1, 5, int(y_len)), g_sp, label="Predict")
+        plt.ylim(0, 1)
+        plt.xlabel('Frequency (THz)')
+        plt.ylabel('Absorptivity')
+        plt.legend()
+        plt.savefig(os.path.join(log_dir, util.TEST_DIR_NAME, str(count) + "_sp.png"))
+        plt.close()
+print(str(loss / idx))
