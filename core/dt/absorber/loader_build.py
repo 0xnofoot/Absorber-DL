@@ -9,6 +9,11 @@ from core import global_var
 
 
 # 构建对于单层金属吸收器的 CST 仿真数据的 Dataset 类
+# @param check_data_dir: 数据存放的目录位置
+# @param left: 数据归一化的左边界，需要根据原始数据的分布规则决定
+# @param right: 数据归一化的右边界，需要根据原始数据的分布规则决定
+# @param scale: 数据归一化后的缩放尺度，一般来说，将数据缩放到0和1之间
+# @param y_len: y轴数据差值参数，例如y轴共1000个数据点，如果需要插值到200个数据点，那么y_len则为5
 class Dataset_BoxCox(data.Dataset):
     def __init__(self, check_data_dir, left, right, scale, y_len):
         if left >= right:
