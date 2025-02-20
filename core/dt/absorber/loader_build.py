@@ -16,6 +16,31 @@ from core import global_var
 # @param y_len: y轴数据差值参数，例如y轴共1000个数据点，如果需要插值到200个数据点，那么y_len则为5
 class Dataset_BoxCox(data.Dataset):
     def __init__(self, check_data_dir, left, right, scale, y_len):
+        """
+        Initialize the dataset by loading simulation data from numpy files and applying multiple transformations including slicing, downsampling, Box-Cox transformation, filtering, and normalization.
+        
+        Parameters:
+            check_data_dir (str): Path to the directory containing the 'x.npy' and 'y.npy' files.
+            left (float): Lower boundary for filtering transformed data. Must be less than 'right'.
+            right (float): Upper boundary for filtering transformed data. Must be greater than 'left'.
+            scale (float): Scaling factor for normalizing the transformed data. Must be greater than 0.
+            y_len (int): Desired number of points along the y-axis after downsampling.
+        
+        Behavior:
+            - Validates that 'left' is less than 'right' and that 'scale' is positive.
+            - Loads x and y data from the specified directory.
+            - Verifies that the number of samples in x and y data are consistent.
+            - Slices and downsamples the y data before applying the Box-Cox transformation.
+            - Displays histograms of the transformed data at various stages for debugging purposes.
+            - Filters out rows in the transformed y data where the minimum value is less than or equal to 'left' or the maximum value is greater than or equal to 'right'.
+            - Applies a scaling transformation to normalize the filtered data.
+            - Ensures the filtered x and y data remain consistent in their sample count.
+            - Converts the final x and y arrays into PyTorch tensors and stores them as instance attributes.
+            - Saves the lambda parameter from the Box-Cox transformation and the total number of samples.
+        
+        Notes:
+            If any validation fails (e.g., invalid boundaries, non-positive scale, inconsistent data lengths), an error message is printed and the initialization terminates without further processing.
+        """
         if left >= right:
             print("left左边界必须小于right右边界！！")
             return
